@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Replace this placeholder with the exact Firebase Auth UID of the admin.
+    // Never let users set their own role/admin field.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid in ['odDrCkEPJoaRYYzAYsc52DBU4hf1'];
+    }
+    function signedIn() { return request.auth != null; }
+    function userActive() {
+      return signedIn()
+        && (!exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active');
+    }
+    function validAd(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 90
+        && data.description is string && data.description.size() <= 1200
+        && data.price is number && data.price >= 0
+        && data.currency in ['EUR', 'MAD']
+        && data.category in ['electronics','home','fashion','vehicles','sports','other']
+        && data.location is string && data.location.size() <= 70
+        && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 25
+        && data.images is list && data.images.size() <= 5;
+    }
+    match /ads/{adId} {
+      // Public visitors can only see active ads. Owners/admin can see their own/all.
+      allow read: if (resource.data.status == 'active')
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || isAdmin();
+
+      allow create: if userActive()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'active'
+        && validAd(request.resource.data);
+
+      // Owner may edit their own content but cannot change ownership or moderation status.
+      allow update: if isAdmin()
+        || (userActive()
+          && resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == resource.data.ownerUid
+          && request.resource.data.status == resource.data.status
+          && validAd(request.resource.data));
+
+      allow delete: if isAdmin()
+        || (userActive() && resource.data.ownerUid == request.auth.uid);
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      // New user can only create their own basic client profile.
+      allow create: if userActive() && request.auth.uid == uid
+        && request.resource.data.role == 'client'
+        && request.resource.data.status == 'active';
+      // User can update only displayName. Admin can update profile/status.
+      allow update: if isAdmin()
+        || (userActive() && request.auth.uid == uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']));
+      allow delete: if isAdmin();
+    }
+
+    match /reports/{reportId} {
+      allow create: if request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0
+        && request.resource.data.reason.size() <= 500
+        && request.resource.data.adId is string;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
