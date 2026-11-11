@@ -26,3 +26,27 @@ body[dir=rtl] .lightbox-close{right:auto;left:24px}
 .iti__dropdown-content{z-index:3001}
 .iti__search-input{width:100%;box-sizing:border-box;padding:10px}
 .phone-hint{display:block;margin-top:7px;color:var(--muted);font-size:12px}
+
+/* Product comments and seller replies */
+.comments-open-btn{border:1px solid var(--line);background:#fff;color:var(--green);border-radius:9px;padding:9px 11px;font-weight:700;font-size:12px;white-space:nowrap}
+.comments-open-btn:hover{background:var(--mint);border-color:#c8dfd2}
+.comments-modal{max-width:720px;max-height:90vh;overflow-y:auto}
+.comments-product-title{margin:-8px 0 18px;color:var(--muted);font-weight:600}
+.comments-list{display:grid;gap:12px;max-height:42vh;overflow-y:auto;padding:2px 3px 12px}
+.comment-item{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fff}
+.comment-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}
+.comment-head b{color:var(--ink)}
+.comment-head time{font-size:11px;color:var(--muted)}
+.comment-item>p,.seller-reply>p{margin:9px 0 2px;line-height:1.6;overflow-wrap:anywhere}
+.seller-reply{margin:13px 0 0 18px;padding:11px 13px;border-left:3px solid var(--green);background:var(--mint);border-radius:0 10px 10px 0}
+.seller-reply .comment-head b{color:var(--green-dark)}
+.seller-reply-form{display:flex;gap:8px;margin:12px 0 0 18px}
+.seller-reply-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.comment-form{border-top:1px solid var(--line);padding-top:18px;margin-top:8px}
+.comment-form h3{font-size:16px;margin:0 0 13px}
+.comment-is-hidden{opacity:.65;border-style:dashed}
+body[dir="rtl"] .seller-reply{margin:13px 18px 0 0;border-left:0;border-right:3px solid var(--green);border-radius:10px 0 0 10px}
+body[dir="rtl"] .seller-reply-form{margin:12px 18px 0 0}
+@media(max-width:600px){.comments-open-btn{padding:8px;font-size:11px}.seller-reply-form{flex-direction:column}.comments-modal{max-height:94vh}.comments-list{max-height:36vh}}
+
+@media(max-width:900px){.product-bottom{flex-wrap:wrap;gap:7px;justify-content:flex-start}}

@@ -98,6 +98,24 @@
   </form>
 </section></div>
 
+<!-- Product comments modal -->
+<div class="modal-backdrop hidden" id="commentsModal"><section class="modal modal-wide comments-modal" role="dialog" aria-modal="true" aria-labelledby="commentsTitle">
+  <button class="modal-close" data-close="commentsModal" aria-label="Close">×</button>
+  <span class="eyebrow" data-i18n="community">COMUNIDAD SOUKNA</span>
+  <h2 id="commentsTitle" data-i18n="comments">Preguntas y comentarios</h2>
+  <p id="commentsProductTitle" class="comments-product-title"></p>
+  <div id="commentsList" class="comments-list"><div class="admin-empty">Cargando...</div></div>
+  <form id="commentForm" class="comment-form">
+    <h3 data-i18n="addComment">Escribe una pregunta o comentario</h3>
+    <div class="form-grid">
+      <div class="field"><label for="commentAuthor" data-i18n="displayName">Tu nombre</label><input id="commentAuthor" maxlength="40" required></div>
+      <div class="field full-field"><label for="commentText" data-i18n="commentText">Tu comentario</label><textarea id="commentText" rows="3" maxlength="1000" required></textarea></div>
+    </div>
+    <button class="btn btn-primary full" id="commentSubmit" type="submit" data-i18n="publishComment">Publicar comentario</button>
+    <small class="form-note" data-i18n="commentNotice">Los comentarios son públicos y pueden ser moderados por Soukna.</small>
+  </form>
+</section></div>
+
 <!-- Admin dashboard: visible only to an allow-listed administrator -->
 <div class="modal-backdrop hidden" id="adminModal"><section class="modal modal-wide admin-modal">
   <button class="modal-close" data-close="adminModal">×</button>
@@ -105,6 +123,7 @@
   <div class="admin-tabs">
     <button class="admin-tab active" data-admin-tab="ads" data-i18n="manageAds">Anuncios</button>
     <button class="admin-tab" data-admin-tab="reports" data-i18n="reports">Denuncias</button>
+    <button class="admin-tab" data-admin-tab="comments" data-i18n="commentsModeration">Comentarios</button>
   </div>
   <div id="adminContent" class="admin-content"></div>
   <button class="btn btn-light full" id="adminLogoutBtn" data-i18n="logout">Cerrar sesión</button>

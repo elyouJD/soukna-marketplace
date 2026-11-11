@@ -136,3 +136,20 @@ After uploading this version, publish the included `firestore.rules` in Firebase
 ### Before public launch
 
 Restrict the Cloudinary unsigned upload preset (`soukna-upload`) to images, set a sensible maximum file size and transformations/limits, and enable Firebase App Check where supported. Public guest posting can attract spam, so monitor pending listings and reports. Never put a Cloudinary API Secret in frontend code.
+
+
+## Product comments and seller replies
+
+- Visitors can post public questions/comments without creating a visible account. The app uses Firebase Anonymous Authentication in the background to assign a protected UID.
+- Only the anonymous session that originally published a listing can reply as its seller. Replies are limited to one level (a seller reply to a visitor comment).
+- The administrator can review, hide/restore, and delete comments from the Admin panel > Comments tab.
+- Firestore rules enforce comment creation, seller ownership, public visibility, and administrator moderation.
+
+### Required Firebase setup
+
+1. Open Firebase Console > Authentication > Sign-in method.
+2. Enable **Anonymous** sign-in. This is required to keep guest publishing and comments without a visible registration/login flow while securing seller ownership.
+3. Publish the updated `firestore.rules` file (Firebase Console > Firestore Database > Rules, or run `firebase deploy --only firestore:rules` from the project folder after Firebase CLI is configured).
+4. Publish the updated site.
+
+**Seller identity note:** the seller can reply from the same browser/device session used to publish the ad. If browser storage is cleared or the seller changes device, the anonymous session UID may be lost; account-based seller login would be needed for cross-device seller access. Existing ads created before this feature do not have an `ownerUid`, so their original publishers cannot reply unless the ownership is migrated securely.

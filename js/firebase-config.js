@@ -1,6 +1,6 @@
 // Firebase Web config is public. Security is enforced by Firestore Rules.
 // 1) Create a Firebase project and register a Web app.
-// 2) Enable Authentication > Email/Password and Firestore.
+// 2) Enable Authentication > Email/Password AND Anonymous sign-in, plus Firestore.
 export const firebaseConfig = {
   apiKey: "AIzaSyDujlGSU4D6oDUkRA4fcxewmvPvNczLzX8",
   authDomain: "soukna-2c69a.firebaseapp.com",

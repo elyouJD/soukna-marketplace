@@ -1,20 +1,21 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Only this Firebase Authentication UID is allowed to administer the marketplace.
     function isAdmin() {
       return request.auth != null
         && request.auth.uid in ['odDrCkEPJoaRYYzAYsc52DBU4hf1'];
     }
 
+    function signedIn() { return request.auth != null; }
+
     function validAd(data) {
       return data.keys().hasAll([
           'title','description','price','currency','category','location',
-          'whatsapp','images','status','createdAt','updatedAt'
+          'whatsapp','images','status','createdAt','updatedAt','ownerUid'
         ])
         && data.keys().hasOnly([
           'title','description','price','currency','category','location',
-          'whatsapp','images','status','createdAt','updatedAt'
+          'whatsapp','images','status','createdAt','updatedAt','ownerUid'
         ])
         && data.title is string && data.title.size() > 0 && data.title.size() <= 90
         && data.description is string && data.description.size() > 0 && data.description.size() <= 1200
@@ -24,23 +25,55 @@ service cloud.firestore {
         && data.location is string && data.location.size() > 0 && data.location.size() <= 70
         && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 25
         && data.images is list && data.images.size() <= 5
-        && data.createdAt is timestamp && data.updatedAt is timestamp;
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && data.ownerUid is string && data.ownerUid == request.auth.uid;
     }
 
     match /ads/{adId} {
       // Visitors can only read approved listings. Admin can see pending and paused listings too.
       allow read: if isAdmin() || resource.data.status == 'active';
-
-      // Anyone can submit a listing without creating an account. Every new listing is pending.
-      allow create: if request.resource.data.status == 'pending'
+      // Anonymous Authentication keeps posting guest-friendly while assigning a protected owner UID.
+      allow create: if signedIn() && request.resource.data.status == 'pending'
         && validAd(request.resource.data);
-
       // Only the administrator can approve, edit, pause or delete listings.
       allow update, delete: if isAdmin();
     }
 
+    match /comments/{commentId} {
+      // Public visitors can read visible comments on active ads. Admin can review all comments.
+      allow read: if isAdmin() || resource.data.status == 'visible';
+
+      // Any anonymous or authenticated visitor may add a top-level comment to an active ad.
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['adId','parentId','authorUid','authorName','authorRole','text','status','createdAt'])
+        && request.resource.data.keys().hasAll(['adId','parentId','authorUid','authorName','authorRole','text','status','createdAt'])
+        && request.resource.data.adId is string
+        && get(/databases/$(database)/documents/ads/$(request.resource.data.adId)).data.status == 'active'
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() >= 2
+        && request.resource.data.authorName.size() <= 40
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.status == 'visible'
+        && request.resource.data.createdAt == request.time
+        && (
+          (request.resource.data.parentId == null && request.resource.data.authorRole == 'visitor')
+          ||
+          (request.resource.data.parentId is string
+            && request.resource.data.authorRole == 'seller'
+            && get(/databases/$(database)/documents/ads/$(request.resource.data.adId)).data.ownerUid == request.auth.uid
+            && exists(/databases/$(database)/documents/comments/$(request.resource.data.parentId))
+            && get(/databases/$(database)/documents/comments/$(request.resource.data.parentId)).data.adId == request.resource.data.adId
+            && get(/databases/$(database)/documents/comments/$(request.resource.data.parentId)).data.parentId == null)
+        );
+
+      // Only the administrator can hide, restore or delete comments.
+      allow update, delete: if isAdmin();
+    }
+
     match /reports/{reportId} {
-      // Visitors may report an ad without logging in.
       allow create: if request.resource.data.keys().hasOnly(['adId','reason','createdAt','reporterUid','status'])
         && request.resource.data.adId is string
         && request.resource.data.reason is string
@@ -49,7 +82,6 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
-    // No public user accounts exist in this version. User administration is private.
     match /users/{uid} {
       allow read, write: if isAdmin();
     }
