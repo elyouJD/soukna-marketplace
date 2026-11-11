@@ -1,0 +1,7 @@
+{
+  "name": "soukna-marketplace",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Soukna marketplace with Firebase, Cloudinary and multilingual UI"
+}

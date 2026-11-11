@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176b52">
+  <meta name="description" content="Soukna - compra y vende cerca de ti">
+  <title>Soukna | Marketplace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/css/intlTelInput.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a class="brand" href="#"><span class="brand-mark">S</span><span>sou<span class="brand-accent">kna</span></span></a>
+    <div class="search-wrap"><span>⌕</span><input id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Buscar productos..."><button id="searchBtn" data-i18n="search">Buscar</button></div>
+    <nav class="nav-actions">
+      <select id="languageSelect" aria-label="Language">
+        <option value="es">🇪🇸 ES</option><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇲🇦 AR</option>
+      </select>
+      <button class="btn btn-light" id="loginBtn" data-i18n="adminLogin">Acceso administrador</button>
+      <button class="btn btn-primary" id="sellBtn" data-i18n="postAd">Publicar anuncio</button>
+      <button class="btn btn-light hidden" id="adminBtn" data-i18n="adminPanel">Admin</button>
+    </nav>
+    <button class="mobile-menu" id="mobileMenu" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow" data-i18n="heroEyebrow">EL MERCADO ES TUYO</span>
+        <h1 data-i18n="heroTitle">Encuentra. Vende.<br><em>Vuelve a empezar.</em></h1>
+        <p data-i18n="heroText">Compra y vende artículos cerca de ti. Fácil, rápido y directamente con las personas.</p>
+        <button class="btn btn-white" id="heroSellBtn" data-i18n="postFree">Publica gratis <span>↗</span></button>
+        <div class="hero-proof"><span class="proof-dots">● ● ●</span><span data-i18n="heroProof">Una forma más sencilla de dar una segunda vida a tus cosas.</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-circle"></div><div class="art-card art-card-one"><span>🎧</span><b>Audio</b><small>€ 25</small></div>
+        <div class="art-card art-card-two"><span>📷</span><b>Camera</b><small>€ 120</small></div>
+        <div class="art-card art-card-three"><span>🪴</span><b>Home</b><small>€ 18</small></div>
+        <div class="art-spark">✳</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container category-section">
+    <div class="section-heading"><div><span class="eyebrow" data-i18n="explore">EXPLORA</span><h2 data-i18n="categories">Categorías populares</h2></div><button class="text-btn" id="allCategories" data-i18n="allCategories">Ver todas →</button></div>
+    <div class="category-grid" id="categoryGrid"></div>
+  </section>
+
+  <section class="container listing-section" id="listings">
+    <div class="section-heading listing-heading"><div><span class="eyebrow" data-i18n="freshFinds">NUEVOS DESCUBRIMIENTOS</span><h2 data-i18n="latestAds">Anuncios recientes</h2></div>
+      <select id="categoryFilter" class="filter-select"><option value="all" data-i18n="allCategories">Todas las categorías</option></select>
+    </div>
+    <div class="listing-grid" id="listingGrid"><div class="loading" data-i18n="loading">Cargando anuncios...</div></div>
+    <div class="empty-state hidden" id="emptyState"><div>🛍️</div><h3 data-i18n="noAds">Todavía no hay anuncios</h3><p data-i18n="noAdsText">Sé la primera persona en publicar algo.</p><button class="btn btn-primary" id="emptyPostBtn" data-i18n="postAd">Publicar anuncio</button></div>
+  </section>
+
+  <section class="container trust-strip">
+    <div><span>🛡️</span><b data-i18n="trustOne">Trato directo</b><small data-i18n="trustOneText">Habla directamente con el vendedor.</small></div>
+    <div><span>📱</span><b data-i18n="trustTwo">Fácil desde el móvil</b><small data-i18n="trustTwoText">Publica tus fotos en segundos.</small></div>
+    <div><span>🌱</span><b data-i18n="trustThree">Dale otra vida</b><small data-i18n="trustThreeText">Compra y vende de forma responsable.</small></div>
+  </section>
+</main>
+
+<footer><div class="container footer-inner"><a class="brand footer-brand" href="#"><span class="brand-mark">S</span><span>sou<span class="brand-accent">kna</span></span></a><p data-i18n="footerText">Tu mercado local, en un solo lugar.</p><span>© <span id="year"></span> Soukna</span></div></footer>
+
+<!-- Auth modal -->
+<div class="modal-backdrop hidden" id="authModal"><section class="modal">
+  <button class="modal-close" data-close="authModal">×</button><span class="eyebrow" data-i18n="welcome">BIENVENIDO A SOUKNA</span><h2 id="authTitle" data-i18n="login">Entrar</h2>
+  <form id="authForm"><label data-i18n="email">Correo electrónico</label><input id="authEmail" type="email" required placeholder="nombre@correo.com"><label data-i18n="password">Contraseña</label><input id="authPassword" type="password" minlength="6" required placeholder="••••••••"><button class="btn btn-primary full" type="submit" id="authSubmit" data-i18n="login">Entrar</button></form>
+  <p class="form-note" data-i18n="adminOnlyNote">Acceso reservado exclusivamente al administrador.</p>
+</section></div>
+
+<!-- Publish/edit modal -->
+<div class="modal-backdrop hidden" id="adModal"><section class="modal modal-wide">
+  <button class="modal-close" data-close="adModal">×</button><span class="eyebrow" data-i18n="sellerSpace">ESPACIO DEL VENDEDOR</span><h2 id="adModalTitle" data-i18n="createAd">Crear anuncio</h2>
+  <form id="adForm" class="ad-form">
+    <div class="form-grid">
+      <div class="field full-field"><label data-i18n="productTitle">Nombre del producto</label><input id="adTitle" maxlength="90" required></div>
+      <div class="field"><label data-i18n="price">Precio</label><input id="adPrice" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+      <div class="field"><label data-i18n="currency">Moneda</label><select id="adCurrency"><option value="EUR">EUR (€)</option><option value="MAD">MAD (DH)</option></select></div>
+      <div class="field"><label data-i18n="category">Categoría</label><select id="adCategory" required></select></div>
+      <div class="field"><label data-i18n="location">Ciudad / zona</label><input id="adLocation" maxlength="70" required></div>
+      <div class="field full-field"><label data-i18n="description">Descripción</label><textarea id="adDescription" rows="4" maxlength="1200" required></textarea></div>
+      <div class="field"><label data-i18n="whatsapp">Número de WhatsApp</label><input id="adWhatsapp" type="tel" autocomplete="tel" placeholder="600 000 000" required>
+        <small class="phone-hint">Selecciona tu país y escribe tu número de WhatsApp.</small></div>
+      <div class="field"><label data-i18n="photos">Fotos del producto</label><input id="adImages" type="file" accept="image/*" multiple></div>
+      <div class="field full-field"><div id="imagePreview" class="image-preview"></div><small data-i18n="photoHint">Hasta 5 imágenes. Usa fotos claras del producto.</small></div>
+    </div>
+    <button class="btn btn-primary full" id="publishSubmit" type="submit" data-i18n="publishNow">Publicar anuncio</button>
+    <p class="form-note" data-i18n="publishNote">No realices pagos por adelantado a personas que no conoces.</p>
+  </form>
+</section></div>
+
+<!-- Admin dashboard: visible only to an allow-listed administrator -->
+<div class="modal-backdrop hidden" id="adminModal"><section class="modal modal-wide admin-modal">
+  <button class="modal-close" data-close="adminModal">×</button>
+  <span class="eyebrow" data-i18n="adminSpace">ADMINISTRATION</span><h2 data-i18n="adminPanel">Admin panel</h2>
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-admin-tab="ads" data-i18n="manageAds">Anuncios</button>
+    <button class="admin-tab" data-admin-tab="reports" data-i18n="reports">Denuncias</button>
+  </div>
+  <div id="adminContent" class="admin-content"></div>
+  <button class="btn btn-light full" id="adminLogoutBtn" data-i18n="logout">Cerrar sesión</button>
+</section></div>
+
+<div class="image-lightbox hidden" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Product image viewer">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close image">×</button>
+  <figure><img id="lightboxImage" src="" alt=""><figcaption id="lightboxCaption"></figcaption></figure>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/intlTelInput.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
