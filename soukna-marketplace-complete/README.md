@@ -120,3 +120,19 @@ No se necesita R2, Worker, tarjeta bancaria de R2 ni variable secreta para la su
 6. Inicia sesión con otra cuenta y comprueba que no puede editar ni borrar el anuncio del primer usuario.
 7. Prueba los cuatro idiomas y el contacto por WhatsApp.
 
+
+
+## Guest publishing and administrator access
+
+- Visitors can submit a listing without creating an account or entering an email/password.
+- Every visitor submission is saved with status `pending` and is not visible publicly until the administrator approves it.
+- Only the Firebase Auth UID configured in `js/firebase-config.js` and `firestore.rules` can sign in to the admin panel, approve/pause/edit/delete listings, and review reports.
+- The public listing form asks for a WhatsApp number so buyers can contact the seller directly. Visitors cannot edit or delete a submitted listing; the administrator manages it.
+
+### Required Firebase deployment step
+
+After uploading this version, publish the included `firestore.rules` in Firebase Console → Firestore Database → Rules. The old rules require a signed-in owner and will block guest submissions. Do not skip this step.
+
+### Before public launch
+
+Restrict the Cloudinary unsigned upload preset (`soukna-upload`) to images, set a sensible maximum file size and transformations/limits, and enable Firebase App Check where supported. Public guest posting can attract spam, so monitor pending listings and reports. Never put a Cloudinary API Secret in frontend code.

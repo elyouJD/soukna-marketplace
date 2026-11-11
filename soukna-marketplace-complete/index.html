@@ -20,10 +20,9 @@
       <select id="languageSelect" aria-label="Language">
         <option value="es">🇪🇸 ES</option><option value="fr">🇫🇷 FR</option><option value="en">🇬🇧 EN</option><option value="ar">🇲🇦 AR</option>
       </select>
-      <button class="btn btn-light" id="loginBtn" data-i18n="login">Entrar</button>
+      <button class="btn btn-light" id="loginBtn" data-i18n="adminLogin">Acceso administrador</button>
       <button class="btn btn-primary" id="sellBtn" data-i18n="postAd">Publicar anuncio</button>
       <button class="btn btn-light hidden" id="adminBtn" data-i18n="adminPanel">Admin</button>
-      <button class="avatar-btn hidden" id="accountBtn" title="My account">☺</button>
     </nav>
     <button class="mobile-menu" id="mobileMenu" aria-label="Menu">☰</button>
   </div>
@@ -74,8 +73,7 @@
 <div class="modal-backdrop hidden" id="authModal"><section class="modal">
   <button class="modal-close" data-close="authModal">×</button><span class="eyebrow" data-i18n="welcome">BIENVENIDO A SOUKNA</span><h2 id="authTitle" data-i18n="login">Entrar</h2>
   <form id="authForm"><label data-i18n="email">Correo electrónico</label><input id="authEmail" type="email" required placeholder="nombre@correo.com"><label data-i18n="password">Contraseña</label><input id="authPassword" type="password" minlength="6" required placeholder="••••••••"><button class="btn btn-primary full" type="submit" id="authSubmit" data-i18n="login">Entrar</button></form>
-  <p class="switch-auth"><span id="authSwitchText" data-i18n="noAccount">¿No tienes cuenta?</span> <button id="authSwitch" class="text-btn" data-i18n="register">Regístrate</button></p>
-  <p class="form-note" data-i18n="authNote">Usamos tu cuenta solo para gestionar tus anuncios.</p>
+  <p class="form-note" data-i18n="adminOnlyNote">Acceso reservado exclusivamente al administrador.</p>
 </section></div>
 
 <!-- Publish/edit modal -->
@@ -98,12 +96,6 @@
   </form>
 </section></div>
 
-<!-- Account modal -->
-<div class="modal-backdrop hidden" id="accountModal"><section class="modal">
-  <button class="modal-close" data-close="accountModal">×</button><span class="eyebrow" data-i18n="mySpace">MI ESPACIO</span><h2 data-i18n="myAds">Mis anuncios</h2><p id="accountEmail" class="account-email"></p><div id="myAdsList" class="my-ads-list"></div><button class="btn btn-light full" id="logoutBtn" data-i18n="logout">Cerrar sesión</button>
-</section></div>
-
-
 <!-- Admin dashboard: visible only to an allow-listed administrator -->
 <div class="modal-backdrop hidden" id="adminModal"><section class="modal modal-wide admin-modal">
   <button class="modal-close" data-close="adminModal">×</button>
@@ -111,9 +103,9 @@
   <div class="admin-tabs">
     <button class="admin-tab active" data-admin-tab="ads" data-i18n="manageAds">Anuncios</button>
     <button class="admin-tab" data-admin-tab="reports" data-i18n="reports">Denuncias</button>
-    <button class="admin-tab" data-admin-tab="users" data-i18n="users">Usuarios</button>
   </div>
   <div id="adminContent" class="admin-content"></div>
+  <button class="btn btn-light full" id="adminLogoutBtn" data-i18n="logout">Cerrar sesión</button>
 </section></div>
 
 <div class="image-lightbox hidden" id="imageLightbox" role="dialog" aria-modal="true" aria-label="Product image viewer">

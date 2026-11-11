@@ -1,70 +1,57 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Replace this placeholder with the exact Firebase Auth UID of the admin.
-    // Never let users set their own role/admin field.
+    // Only this Firebase Authentication UID is allowed to administer the marketplace.
     function isAdmin() {
       return request.auth != null
         && request.auth.uid in ['odDrCkEPJoaRYYzAYsc52DBU4hf1'];
     }
-    function signedIn() { return request.auth != null; }
-    function userActive() {
-      return signedIn()
-        && (!exists(/databases/$(database)/documents/users/$(request.auth.uid))
-          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active');
-    }
+
     function validAd(data) {
-      return data.title is string && data.title.size() > 0 && data.title.size() <= 90
-        && data.description is string && data.description.size() <= 1200
-        && data.price is number && data.price >= 0
+      return data.keys().hasAll([
+          'title','description','price','currency','category','location',
+          'whatsapp','images','status','createdAt','updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'title','description','price','currency','category','location',
+          'whatsapp','images','status','createdAt','updatedAt'
+        ])
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 90
+        && data.description is string && data.description.size() > 0 && data.description.size() <= 1200
+        && data.price is number && data.price >= 0 && data.price <= 100000000
         && data.currency in ['EUR', 'MAD']
         && data.category in ['electronics','home','fashion','vehicles','sports','other']
-        && data.location is string && data.location.size() <= 70
+        && data.location is string && data.location.size() > 0 && data.location.size() <= 70
         && data.whatsapp is string && data.whatsapp.size() >= 8 && data.whatsapp.size() <= 25
-        && data.images is list && data.images.size() <= 5;
+        && data.images is list && data.images.size() <= 5
+        && data.createdAt is timestamp && data.updatedAt is timestamp;
     }
-    match /ads/{adId} {
-      // Public visitors can only see active ads. Owners/admin can see their own/all.
-      allow read: if (resource.data.status == 'active')
-        || (signedIn() && resource.data.ownerUid == request.auth.uid)
-        || isAdmin();
 
-      allow create: if userActive()
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.status == 'active'
+    match /ads/{adId} {
+      // Visitors can only read approved listings. Admin can see pending and paused listings too.
+      allow read: if isAdmin() || resource.data.status == 'active';
+
+      // Anyone can submit a listing without creating an account. Every new listing is pending.
+      allow create: if request.resource.data.status == 'pending'
         && validAd(request.resource.data);
 
-      // Owner may edit their own content but cannot change ownership or moderation status.
-      allow update: if isAdmin()
-        || (userActive()
-          && resource.data.ownerUid == request.auth.uid
-          && request.resource.data.ownerUid == resource.data.ownerUid
-          && request.resource.data.status == resource.data.status
-          && validAd(request.resource.data));
-
-      allow delete: if isAdmin()
-        || (userActive() && resource.data.ownerUid == request.auth.uid);
-    }
-
-    match /users/{uid} {
-      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
-      // New user can only create their own basic client profile.
-      allow create: if userActive() && request.auth.uid == uid
-        && request.resource.data.role == 'client'
-        && request.resource.data.status == 'active';
-      // User can update only displayName. Admin can update profile/status.
-      allow update: if isAdmin()
-        || (userActive() && request.auth.uid == uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']));
-      allow delete: if isAdmin();
+      // Only the administrator can approve, edit, pause or delete listings.
+      allow update, delete: if isAdmin();
     }
 
     match /reports/{reportId} {
-      allow create: if request.resource.data.reason is string
+      // Visitors may report an ad without logging in.
+      allow create: if request.resource.data.keys().hasOnly(['adId','reason','createdAt','reporterUid','status'])
+        && request.resource.data.adId is string
+        && request.resource.data.reason is string
         && request.resource.data.reason.size() > 0
-        && request.resource.data.reason.size() <= 500
-        && request.resource.data.adId is string;
+        && request.resource.data.reason.size() <= 500;
       allow read, update, delete: if isAdmin();
+    }
+
+    // No public user accounts exist in this version. User administration is private.
+    match /users/{uid} {
+      allow read, write: if isAdmin();
     }
   }
 }
